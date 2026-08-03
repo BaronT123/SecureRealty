@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SecureRealty Chat Test</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+
+<h2>SecureRealty Chat</h2>
+
+<hr>
+<label>I am:</label>
+
+<select id="currentUser">
+    <option value="customer">Customer</option>
+    <option value="realtor">Realtor</option>
+</select>
+
+<br><br>
+
+<label>Customer ID</label><br>
+<input id="customerId" placeholder="CUSTOMER001"><br><br>
+
+<label>Realtor ID</label><br>
+<input id="realtorId" placeholder="REALTOR001"><br><br>
+
+<button onclick="createConversation()">
+Create / Load Conversation
+</button>
+
+<p>
+Conversation ID:
+<span id="conversationId">None</span>
+</p>
+
+<hr>
+
+
+
+<br><br>
+
+<input id="message"
+       placeholder="Type message"
+       size="40">
+
+<button onclick="sendMessage()">
+Send
+</button>
+
+<hr>
+
+<h3>Conversation</h3>
+
+<div id="messages"></div>
+
+<script>
+
+let stompClient = null;
+let conversationId = null;
+let chatSubscription = null;
+
+function createConversation(){
+
+    fetch("http://localhost:8080/conversations",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            customerId:document.getElementById("customerId").value,
+            realtorId:document.getElementById("realtorId").value
+        })
+    })
+
+    .then(response=>response.json())
+
+    .then(conversation=>{
+
+        conversationId=conversation.id;
+		
+		subscribeToConversation();
+
+        document.getElementById("conversationId").innerHTML=conversation.id;
+
+        loadMessages();
+
+    });
+
+}
+
+function subscribeToConversation(){
+	
+	if (chatSubscription) {
+	        chatSubscription.unsubscribe();
+	    }
+
+    stompClient.subscribe(
+
+        "/topic/chat/" + conversationId,
+
+        function(chat){
+
+            const message = JSON.parse(chat.body);
+
+            document.getElementById("messages").innerHTML +=
+                "<p><b>" +
+                message.sender +
+                "</b>: " +
+                message.message +
+                "</p>";
+
+        }
+
+    );
+
+}
+
+function loadMessages(){
+
+    fetch("http://localhost:8080/messages/"+conversationId)
+
+    .then(response=>response.json())
+
+    .then(messages=>{
+
+        document.getElementById("messages").innerHTML="";
+
+        messages.forEach(message=>{
+
+            document.getElementById("messages").innerHTML+=
+                "<p><b>"+message.sender+
+                "</b>: "+
+                message.message+
+                "</p>";
+
+        });
+
+    });
+
+}
+
+function connect(callback){
+
+    const socket = new SockJS("/chat");
+
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function(){
+
+        console.log("Connected");
+
+        if(callback){
+            callback();
+        }
+
+    });
+
+}
+
+function sendMessage(){
+
+	let sender;
+	let receiver;
+
+	if(document.getElementById("currentUser").value === "customer"){
+
+	    sender = document.getElementById("customerId").value;
+	    receiver = document.getElementById("realtorId").value;
+
+	}else{
+
+	    sender = document.getElementById("realtorId").value;
+	    receiver = document.getElementById("customerId").value;
+
+	}
+
+    const chatMessage={
+
+        conversationId:conversationId,
+
+        sender:sender,
+
+        receiver:receiver,
+
+        message:document.getElementById("message").value
+
+    };
+
+    stompClient.send(
+        "/app/sendMessage",
+        {},
+        JSON.stringify(chatMessage)
+    );
+
+    document.getElementById("message").value="";
+
+}
+window.onload = function(){
+
+    connect();
+
+}
+
+</script>
+
+</body>
+</html>
