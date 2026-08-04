@@ -41,7 +41,8 @@ public class SecurityConfig {
                         "/users",
                         "/chat/**",
                         "/chat",
-                        "/topic/**"
+                        "/topic/**",
+                        "/test-encryption"
                 ).permitAll()
 
                 .anyRequest().authenticated())

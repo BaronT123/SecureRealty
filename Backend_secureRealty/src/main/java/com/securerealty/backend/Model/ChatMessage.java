@@ -13,6 +13,7 @@ public class ChatMessage {
     private String message;
     private LocalDateTime timestamp;
     private boolean read;
+    private String iv;
 
     public ChatMessage() {
     }
@@ -79,5 +80,12 @@ public class ChatMessage {
 
     public void setRead(boolean read) {
         this.read = read;
+    }
+    public String getIv() {
+        return iv;
+    }
+
+    public void setIv(String iv) {
+        this.iv = iv;
     }
 }

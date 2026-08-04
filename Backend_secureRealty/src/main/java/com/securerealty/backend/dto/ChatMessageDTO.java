@@ -6,6 +6,7 @@ public class ChatMessageDTO {
     private String sender;
     private String receiver;
     private String message;
+    
 
     public ChatMessageDTO() {
     }
@@ -52,4 +53,5 @@ public class ChatMessageDTO {
     public void setMessage(String message) {
         this.message = message;
     }
+    
 }
