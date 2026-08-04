@@ -1,5 +1,5 @@
 package com.securerealty.backend.Controller;
-
+import java.security.Principal;
 import com.securerealty.backend.Model.ChatMessage;
 import com.securerealty.backend.Service.ChatService;
 import com.securerealty.backend.dto.ChatMessageDTO;
@@ -22,12 +22,19 @@ public class ChatController {
     }
 
     @MessageMapping("/sendMessage")
-    public void sendMessage(ChatMessageDTO messageDTO) {
+    public void sendMessage(ChatMessageDTO messageDTO,
+                            Principal principal) throws Exception {
+
+    	System.out.println("Principal = " + principal);
+
+        if (principal != null) {
+            System.out.println("Username = " + principal.getName());
+        }
 
         ChatMessage message = new ChatMessage();
 
         message.setConversationId(messageDTO.getConversationId());
-        message.setSender(messageDTO.getSender());
+        message.setSender(messageDTO.getSender());   // temporary
         message.setReceiver(messageDTO.getReceiver());
         message.setMessage(messageDTO.getMessage());
 

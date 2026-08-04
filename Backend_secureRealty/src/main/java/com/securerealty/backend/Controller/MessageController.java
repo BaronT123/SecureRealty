@@ -19,7 +19,7 @@ public class MessageController {
 
     @GetMapping("/{conversationId}")
     public List<ChatMessage> getMessages(
-            @PathVariable String conversationId) {
+            @PathVariable String conversationId) throws Exception{
 
         return chatService.getConversationMessages(conversationId);
     }

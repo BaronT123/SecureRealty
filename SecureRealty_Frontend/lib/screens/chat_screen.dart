@@ -179,33 +179,22 @@ void subscribeToConversation() {
 void connectWebSocket() {
 
   stompClient = StompClient(
+  config: StompConfig.sockJS(
+    url: 'http://localhost:8080/chat',
 
-    config: StompConfig.sockJS(
+    stompConnectHeaders: {
+      "Authorization": "Bearer ${widget.jwtToken}",
+    },
 
-      url: 'http://localhost:8080/chat',
+    webSocketConnectHeaders: {
+      "Authorization": "Bearer ${widget.jwtToken}",
+    },
 
-      onConnect: (StompFrame frame) {
-
-        print("Connected to WebSocket");
-        
-
-      },
-
-      onWebSocketError: (dynamic error) {
-
-        print(error);
-
-      },
-
-      onStompError: (frame) {
-
-        print(frame.body);
-
-      },
-
-    ),
-
-  );
+    onConnect: (frame) {
+      print("Connected to WebSocket");
+    },
+  ),
+);
 
   stompClient.activate();
 
