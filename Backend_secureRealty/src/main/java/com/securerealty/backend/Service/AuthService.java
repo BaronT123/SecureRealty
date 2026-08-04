@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.securerealty.backend.Model.User;
 import com.securerealty.backend.Repository.UserRepository;
+import com.securerealty.backend.dto.LoginResponse;
 
 @Service
 public class AuthService {
@@ -15,21 +16,28 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
-	public String authenticateUser(String email,String password) {
+	public LoginResponse authenticateUser(String email, String password) {
 
-		User user = repository.findByEmail(email);
+	    User user = repository.findByEmail(email);
 
 	    if (user == null) {
 	        return null;
 	    }
 
-	    if (user != null &&
-	    	    passwordEncoder.matches(password, user.getPassword())) {
+	    if (passwordEncoder.matches(password, user.getPassword())) {
 
-	    	return jwtService.generateToken(user);
-	    	}
+	        String token = jwtService.generateToken(user);
+	        System.out.println("===== LOGIN SUCCESS =====");
+	        System.out.println("User: " + user.getEmail());
+	        System.out.println("Role: " + user.getRole());
+	        System.out.println("JWT: " + token);
 
+	        return new LoginResponse(
+	                token,
+	                user.getRole()
+	        );
+	    }
 
 	    return null;
-}
+	}
 }
