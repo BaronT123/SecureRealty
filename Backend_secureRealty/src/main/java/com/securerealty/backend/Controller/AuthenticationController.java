@@ -1,5 +1,5 @@
 package com.securerealty.backend.Controller;
-
+import com.securerealty.backend.dto.LoginResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,10 +23,9 @@ public class AuthenticationController {
     @PostMapping
     public LoginResponse verify(@RequestBody LoginRequest request) {
 
-        String token = service.authenticateUser(
+    	return service.authenticateUser(
                 request.getEmail(),
-                request.getPassword());
-
-        return new LoginResponse(token);
+                request.getPassword()
+        );
     }
 }

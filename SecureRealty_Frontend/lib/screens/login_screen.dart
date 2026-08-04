@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:securerealty/home_page.dart';
 import 'signup_screen.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:securerealty/customer_home_page.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -53,15 +54,34 @@ class _LoginScreenState extends State<LoginScreen> {
         final currentUser = decodedToken['sub']?.toString() ??
             decodedToken['email']?.toString() ??
             'user';
+        String role = responseBody["role"];
 
         debugPrint('Decoded user: $currentUser');
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => HomePage(jwtToken: token, currentUser: currentUser),
-          ),
-        );
+        if (role == "CUSTOMER") {
+
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (_) => CustomerHomePage(
+        jwtToken: token,
+      ),
+    ),
+  );
+
+} else {
+
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (_) => HomePage(
+        jwtToken: token,
+        currentUser: currentUser,
+      ),
+    ),
+  );
+
+}
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

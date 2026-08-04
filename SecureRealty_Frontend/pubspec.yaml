@@ -37,6 +37,7 @@ dependencies:
   stomp_dart_client: ^3.0.1
   http: ^1.6.0
   jwt_decoder: ^2.0.1
+  file_picker: ^11.0.3
 
 dev_dependencies:
   flutter_test:
