@@ -9,29 +9,41 @@ import com.securerealty.backend.Repository.*;
 @Service
 
 public class ConversationService {
-	private final ConversationRepository repository;
+	private final ConversationRepository crepository;
+	private final UserRepository urepository;
 
-    public ConversationService(ConversationRepository repository) {
-        this.repository = repository;
+    public ConversationService(ConversationRepository crepository, UserRepository urepository) {
+        this.crepository = crepository;
+		this.urepository = urepository;
     }
     public Conversation createConversation(Conversation conversation) {
-    	return repository.save(conversation);
+    	return crepository.save(conversation);
     }
     public Conversation getConversationById(String id) {
-        return repository.findById(id).orElse(null);
+        return crepository.findById(id).orElse(null);
     }
-    public List<Conversation> getAllConversations() {
-        return repository.findAll();
+    public List<Conversation> getConversations(String username) {
+
+        User user = urepository.findByName(username);
+
+        if ("CLIENT".equals(user.getRole())) {
+
+            getOrCreateConversation(username, "DaudM");
+
+            return crepository.findByCustomerId(username);
+        }
+
+        return crepository.findByRealtorId(username);
     }
     public void deleteConversation(String id) {
-        repository.deleteById(id);
+        crepository.deleteById(id);
     }
     public Conversation getOrCreateConversation(
             String customerId,
             String realtorId) {
 
         Conversation conversation =
-                repository.findByCustomerIdAndRealtorId(
+                crepository.findByCustomerIdAndRealtorId(
                         customerId,
                         realtorId);
 
@@ -46,6 +58,6 @@ public class ConversationService {
         newConversation.setRealtorId(realtorId);
         newConversation.setCreatedAt(LocalDateTime.now());
 
-        return repository.save(newConversation);
+        return crepository.save(newConversation);
     }
 }

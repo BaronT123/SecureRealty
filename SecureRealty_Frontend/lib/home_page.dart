@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:securerealty/screens/chat_screen.dart';
+import 'package:securerealty/screens/conversations_screen.dart';
 import 'package:securerealty/screens/dashboard_screen.dart';
 import 'package:securerealty/screens/documents_screen.dart';
 import 'package:securerealty/screens/profile_screen.dart';
@@ -26,7 +26,10 @@ class _HomePageState extends State<HomePage> {
     pages = [
       const DashboardScreen(),
       DocumentScreen(jwtToken: widget.jwtToken),
-      ChatScreen(jwtToken: widget.jwtToken, currentUser: widget.currentUser),
+      ConversationsScreen(
+  jwtToken: widget.jwtToken,
+  currentUser: widget.currentUser,
+),
       const ProfileScreen(),
     ];
   }
