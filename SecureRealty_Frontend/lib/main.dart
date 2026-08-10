@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
     pages = [
       const DashboardScreen(),
       DocumentScreen(jwtToken: widget.jwtToken),
-      ChatScreen(jwtToken: widget.jwtToken, currentUser: widget.currentUser), // Pass the JWT token and current user to ChatScreen
+      ChatScreen(jwtToken: widget.jwtToken, currentUser: widget.currentUser, conversationId: "", receiver: ""), // Pass the JWT token and current user to ChatScreen
       const ProfileScreen(),
     ];
   }

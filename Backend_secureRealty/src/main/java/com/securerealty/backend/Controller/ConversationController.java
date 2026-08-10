@@ -1,5 +1,6 @@
 package com.securerealty.backend.Controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +29,12 @@ public class ConversationController {
     
 
     @GetMapping
-    public List<Conversation> getAllConversations() {
+    public List<Conversation> getConversations(
+            Principal principal) {
 
-        return service.getAllConversations();
+        return service.getConversations(
+                principal.getName());
 
-    }
+    }}
 
-}
+

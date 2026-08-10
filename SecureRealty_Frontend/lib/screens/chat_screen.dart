@@ -6,9 +6,20 @@ import '../models/chat_message.dart';
 import 'dart:convert';
 
 class ChatScreen extends StatefulWidget {
+
   final String jwtToken;
   final String currentUser;
-  const ChatScreen({super.key, required this.jwtToken, required this.currentUser});
+
+  final String conversationId;
+  final String receiver;
+
+  const ChatScreen({
+    super.key,
+    required this.jwtToken,
+    required this.currentUser,
+    required this.conversationId,
+    required this.receiver,
+  });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -24,67 +35,15 @@ class _ChatScreenState extends State<ChatScreen> {
   List<ChatMessage> messages = [];
 
 
-  String? conversationId;
-  String? receiver;
-  Future<void> fetchConversation() async {
-
-  final response = await http.get(
-    Uri.parse("http://localhost:8080/conversations"),
-    headers: {
-      "Authorization": "Bearer ${widget.jwtToken}",
-    },
-  );
-
-  print("===== FETCH CONVERSATION =====");
-  print("Status Code: ${response.statusCode}");
-  print("Body: ${response.body}");
-
-  if (response.statusCode == 200) {
-
-    if (response.body.isEmpty) {
-      print("Conversation response is EMPTY!");
-      return;
-    }
-
-    final List conversations = jsonDecode(response.body);
-
-    if (conversations.isEmpty) {
-      print("No conversations found.");
-      return;
-    }
-
-    final conversation = conversations[0];
-
-    conversationId = conversation["id"];
-
-    receiver = conversation["customerId"] == widget.currentUser
-        ? conversation["realtorId"]
-        : conversation["customerId"];
-
-    print("Conversation ID: $conversationId");
-    print("Receiver: $receiver");
-
-    subscribeToConversation();
-
-    setState(() {});
-
-    await loadMessages();
-
-  } else {
-
-    print("Failed to fetch conversation");
-    print("Status: ${response.statusCode}");
-    print("Body: ${response.body}");
-
-  }
-}
+  
+  
 Future<void> loadMessages() async {
 
   try {
 
     final response = await http.get(
       Uri.parse(
-        "http://localhost:8080/messages/$conversationId",
+        "http://localhost:8080/messages/${widget.conversationId}",
       ),
       headers: {
         "Content-Type": "application/json",
@@ -153,7 +112,7 @@ void subscribeToConversation() {
 
   stompClient.subscribe(
 
-    destination: "/topic/chat/$conversationId",
+    destination: "/topic/chat/${widget.conversationId}",
 
     callback: (frame) {
 
@@ -210,9 +169,9 @@ void connectWebSocket() {
     }
 
     final message = {
-    "conversationId": conversationId,
+    "conversationId": widget.conversationId,
     "sender": widget.currentUser,
-    "receiver": receiver,
+    "receiver": widget.receiver,
     "message": text,
   };
 
@@ -223,13 +182,13 @@ void connectWebSocket() {
   );
     // Clear the text box
     messageController.clear();
+    loadMessages();
   }
 
   @override
 void initState() {
   super.initState();
   connectWebSocket();
-  fetchConversation();
   loadMessages();
   
 }
@@ -240,7 +199,7 @@ void initState() {
     return Scaffold(
 
       appBar: AppBar(
-        title: Text(receiver ?? "Chat"),
+        title: Text(widget.receiver),
       ),
 
       body: Column(
